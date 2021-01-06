@@ -71,13 +71,11 @@ Euler angle:
     <br>
 
 计算方式：<br>
-<select id = "Calibrate" name="Calibrate_method">
+<select name="Calibrate_method">
     <option value="fromEuler">From Euler</option>
     <option value="fromQuat">From Quat</option>
     <option value="fromMatrix">From Matrix</option>
-    <script>
-        $("#Calibrate").val('{{ archive.Calibrate_method }}');
-    </script>
+
     <br> <br>
 
 </select>
@@ -89,9 +87,9 @@ Euler angle:
 
 Euler angle:<br>
 <form>
-    <input type="text" id="outEuler0", name="euler0", value={{name[0][0]}}>
-    <input type="text" id="outEuler1", name="euler1", value={{name[0][1]}}>
-    <input type="text" id="outEuler2", name="euler2", value={{name[0][2]}}>
+    <input type="text" id="outEuler0", name="euler0", value={{name2[0][0]}}>
+    <input type="text" id="outEuler1", name="euler1", value={{name2[0][1]}}>
+    <input type="text" id="outEuler2", name="euler2", value={{name2[0][2]}}>
     <br>
 </form>
 
@@ -99,26 +97,26 @@ Euler angle:<br>
 
 quaternion:
 <form>
-    <input type="text" , name="outQ0", value={{name[1][0]}}>
-    <input type="text" , name="outQ1", value={{name[1][1]}}>
-    <input type="text" , name="outQ2", value={{name[1][2]}}>
-    <input type="text" , name="outQ3", value={{name[1][3]}}>
+    <input type="text" , name="outQ0", value={{name2[1][0]}}>
+    <input type="text" , name="outQ1", value={{name2[1][1]}}>
+    <input type="text" , name="outQ2", value={{name2[1][2]}}>
+    <input type="text" , name="outQ3", value={{name2[1][3]}}>
     <br>
 </form>
 
 rotation matrix:
 <form>
-    <input type="text" , name="outR00", value={{name[2][0][0]}}>
-    <input type="text" , name="outR01", value={{name[2][0][1]}}>
-    <input type="text" , name="outR02", value={{name[2][0][2]}}>
+    <input type="text" , name="outR00", value={{name2[2][0][0]}}>
+    <input type="text" , name="outR01", value={{name2[2][0][1]}}>
+    <input type="text" , name="outR02", value={{name2[2][0][2]}}>
     <br>
-    <input type="text" , name="outR10", value={{name[2][1][0]}}>
-    <input type="text" , name="outR11", value={{name[2][1][1]}}>
-    <input type="text" , name="outR12", value={{name[2][1][2]}}>
+    <input type="text" , name="outR10", value={{name2[2][1][0]}}>
+    <input type="text" , name="outR11", value={{name2[2][1][1]}}>
+    <input type="text" , name="outR12", value={{name2[2][1][2]}}>
     <br>
-    <input type="text" , name="outR20", value={{name[2][2][0]}}>
-    <input type="text" , name="outR21", value={{name[2][2][1]}}>
-    <input type="text" , name="outR22", value={{name[2][2][2]}}>
+    <input type="text" , name="outR20", value={{name2[2][2][0]}}>
+    <input type="text" , name="outR21", value={{name2[2][2][1]}}>
+    <input type="text" , name="outR22", value={{name2[2][2][2]}}>
     <br>
 </form>
 

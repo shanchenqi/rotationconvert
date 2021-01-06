@@ -17,7 +17,7 @@ quat = [0, 0, 0, 0]
 matrix = [[0,0,0],[0,0,0],[0,0,0]]
 threshold = 1e-6
 get_value = [euler, quat, matrix]
-return_value =[euler, quat, matrix]
+return_value=[euler, quat, matrix]
 
 def mul(q1, q2):
     w = q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2] - q1[3]*q2[3]
@@ -123,6 +123,8 @@ def transform_quat_to_matrix(quat):
 def rotation():
     if request.form['Calibrate_method'] == "fromEuler":
         get_value[0] = [request.form['euler0'], request.form['euler1'], request.form['euler2']]
+        get_value[1] = [0, 0, 0, 0]
+        get_value[2] = [[0,0,0],[0,0,0],[0,0,0]]
         euler = get_value[0]
         types = request.form['euler_order']
         intorext = request.form['euler_type']
@@ -130,44 +132,53 @@ def rotation():
             types = types[::-1]
         euler = list(map(float, euler))
         quat =  euler_to_quat(euler, types)
+        # quat = R.from_euler(types, euler,degrees = False)
         return_value[0] = euler
         return_value[1] = quat
         matrix = transform_quat_to_matrix(quat)
         return_value[2] = matrix
-        return render_template('index.html', inputname = get_value, name=return_value)
+        return render_template('index.html', name=get_value, name2=return_value)
 
     if request.form['Calibrate_method'] == "fromQuat":
         get_value[1] = [request.form['q0'], request.form['q1'], request.form['q2'], request.form['q3']]
+        get_value[0] = [0,0,0]
+        get_value[2] = [[0,0,0],[0,0,0],[0,0,0]]
         quat = list(map(float, get_value[1]))
         rot_matrix = transform_quat_to_matrix(quat)
         types = request.form['euler_order']
         intorext = request.form['euler_type']
+        # quatR =  R.from_quat(get_value[1])
+        # euler = quatR.as_euler(types,degrees=False)
         euler = transform_matrix_to_euler(rot_matrix, intorext, types)
         return_value[0] = euler
         return_value[1] = quat
+        # matrix = quat.as_matrix()
         return_value[2] = rot_matrix
-        return render_template('index.html', inputname = get_value, name=return_value)
+        return render_template('index.html', name=get_value,name2=return_value)
 
     if request.form['Calibrate_method'] == "fromMatrix":
         get_value[2] =[ [request.form['r00'], request.form['r01'], request.form['r02']],
                         [request.form['r10'], request.form['r11'], request.form['r12']],
                         [request.form['r20'], request.form['r21'], request.form['r22']]]
+        get_value[0] = [0,0,0]
+        get_value[1] = [0,0,0,0]
         types = request.form['euler_order']
-        intorext = request.form['euler_type']
         matrix =  R.from_matrix(get_value[2])
+        # euler = matrix.as_euler(types, degrees=False)
         euler = transform_matrix_to_euler(matrix, intorext, types)
         quat = matrix.as_quat()
         return_value[0] = euler
         return_value[1] = quat
         return_value[2] = get_value[2]
-        return render_template('index.html', inputname = get_value, name=return_value)
+        return render_template('index.html', name=get_value,name2=return_value)
 
 @app.route('/')
 def hello():
-    return render_template('index.html', name=return_value)
+    return render_template('index.html', name=get_value, name2=return_value)
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
-
+#   server = pywsgi.WSGIServer(('0.0.0.0', 8080), app)
+#   server.serve_forever()
 
