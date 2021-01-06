@@ -75,10 +75,16 @@ Euler angle:
     <option value="fromEuler">From Euler</option>
     <option value="fromQuat">From Quat</option>
     <option value="fromMatrix">From Matrix</option>
-
     <br> <br>
-
 </select>
+<!--
+<select class="percentText" id="operatorId" name="operatorId">
+    <option value="">--Select All--</option>
+    <c:forEach items="${operators }" var="oper" varStatus="step">
+        <option value="1">宝马</option> <option value="2">奔驰</option> <option value="3">奥迪</option>
+        <option value = "${oper.operatorId }" ${oper.operatorId == param['operatorId']?'selected':''}>${oper.operatorName }</option>
+    </c:forEach>
+    </select> -->
 <br><br>
 <input type="submit" value="计算" >
 </form>
@@ -86,6 +92,10 @@ Euler angle:
 <h1>OUTPUT：</h1>
 
 Euler angle:<br>
+    {% if lock %}
+        <p style="color: red">Gimbal Lock occurs. Euler angles are non-unique</p>
+    {% endif %}
+
 <form>
     <input type="text" id="outEuler0", name="euler0", value={{name2[0][0]}}>
     <input type="text" id="outEuler1", name="euler1", value={{name2[0][1]}}>

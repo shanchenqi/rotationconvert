@@ -39,7 +39,7 @@ def euler_to_quat(euler, type):
         i += 1
     return mul(mul(q[0], q[1]),q[2])
 
-def transform_matrix_to_euler(R, intorext, types):
+def transform_matrix_to_euler(R, intorext, types,lock):
     rotationR = [
         [R[0, 2], R[1, 0], R[1, 1], math.pi * 0.5, R[2, 1], R[1, 1], -math.pi * 0.5, -R[1, 2], R[2, 2], R[0, 2], -R[0, 1], R[0, 0], 0],#INT_XYZ
         [R[0, 1], -R[1, 2], R[2, 2], -math.pi * 0.5, R[2, 0], R[2, 2], math.pi * 0.5, R[2, 1], R[1, 1], -R[0, 1], R[0, 2], R[0, 0], 0],#INT_XZY
@@ -72,38 +72,41 @@ def transform_matrix_to_euler(R, intorext, types):
     types_id = types_euler.index(types)
     if(intorext == 'INT'):
         if(abs(rotationR[types_id][0] -1) < threshold):
+            lock = True
             flash('Gimbal Lock occurs. Euler angles are non-unique, we set the third angle to 0', category='message')
             angles = [math.atan2(rotationR[types_id][1],rotationR[types_id][2]), rotationR[types_id][3], 0]
-            return angles
+            return (angles,lock)
         elif(abs(rotationR[types_id][0] + 1) < threshold):
-
+            lock = True
             flash('Gimbal Lock occurs. Euler angles are non-unique, we set the third angle to 0')
             angles = [math.atan2(rotationR[types_id][4],rotationR[types_id][5]), rotationR[types_id][6], 0]
-            return angles
+            return (angles,lock)
         angles[0] = math.atan2(rotationR[types_id][7],rotationR[types_id][8])
         if (types_id/6 == 1 or types_id/6 == 3):
             angles[1] = math.acos(rotationR[types_id][9])
         else:
             angles[1] = math.asin(rotationR[types_id][9])
         angles[2] = math.atan2(rotationR[types_id][10], rotationR[types_id][11])
-        return angles
+        return (angles,lock)
     elif(intorext == 'EXT'):
         types_id +=12
         if (abs(rotationR[types_id][0] - 1) < threshold):
+            lock = True
             flash("Gimbal Lock occurs. Euler angles are non-unique, we set the first angle to 0")
             angles = [0, rotationR[types_id][1],math.atan2(rotationR[types_id][2], rotationR[types_id][3])]
-            return angles
+            return (angles,lock)
         elif (abs(rotationR[types_id][0] + 1) < threshold):
+            lock = True
             flash("Gimbal Lock occurs. Euler angles are non-unique, we set the first angle to 0")
             angles = [0, rotationR[types_id][4], math.atan2(rotationR[types_id][5], rotationR[types_id][6])]
-            return angles
+            return (angles,lock)
         angles[0] = math.atan2(rotationR[types_id][7], rotationR[types_id][8])
         if (types_id/6 == 1 or types_id/6 == 3):
             angles[1] = math.acos(rotationR[types_id][9])
         else:
            angles[1] = math.asin(rotationR[types_id][9])
         angles[2] = math.atan2(rotationR[types_id][10], rotationR[types_id][11])
-    return angles
+    return (angles,lock)
 
 def transform_quat_to_matrix(quat):
     q = quat.copy()
@@ -132,29 +135,30 @@ def rotation():
             types = types[::-1]
         euler = list(map(float, euler))
         quat =  euler_to_quat(euler, types)
-        # quat = R.from_euler(types, euler,degrees = False)
         return_value[0] = euler
         return_value[1] = quat
         matrix = transform_quat_to_matrix(quat)
         return_value[2] = matrix
-        return render_template('index.html', name=get_value, name2=return_value)
+
+        return render_template('index.html', name=get_value, name2=return_value, lock =False)
 
     if request.form['Calibrate_method'] == "fromQuat":
         get_value[1] = [request.form['q0'], request.form['q1'], request.form['q2'], request.form['q3']]
         get_value[0] = [0,0,0]
         get_value[2] = [[0,0,0],[0,0,0],[0,0,0]]
+        lock = False
         quat = list(map(float, get_value[1]))
         rot_matrix = transform_quat_to_matrix(quat)
         types = request.form['euler_order']
         intorext = request.form['euler_type']
-        # quatR =  R.from_quat(get_value[1])
-        # euler = quatR.as_euler(types,degrees=False)
-        euler = transform_matrix_to_euler(rot_matrix, intorext, types)
+
+
+        (euler,lock) = transform_matrix_to_euler(rot_matrix, intorext, types,lock)
         return_value[0] = euler
         return_value[1] = quat
-        # matrix = quat.as_matrix()
         return_value[2] = rot_matrix
-        return render_template('index.html', name=get_value,name2=return_value)
+
+        return render_template('index.html', name=get_value,name2=return_value, lock =lock)
 
     if request.form['Calibrate_method'] == "fromMatrix":
         get_value[2] =[ [request.form['r00'], request.form['r01'], request.form['r02']],
@@ -163,14 +167,15 @@ def rotation():
         get_value[0] = [0,0,0]
         get_value[1] = [0,0,0,0]
         types = request.form['euler_order']
+        intorext = request.form['euler_type']
         matrix =  R.from_matrix(get_value[2])
-        # euler = matrix.as_euler(types, degrees=False)
-        euler = transform_matrix_to_euler(matrix, intorext, types)
+        lock = False
+        euler = transform_matrix_to_euler(matrix, intorext, types,lock)
         quat = matrix.as_quat()
         return_value[0] = euler
         return_value[1] = quat
         return_value[2] = get_value[2]
-        return render_template('index.html', name=get_value,name2=return_value)
+        return render_template('index.html', name=get_value,name2=return_value, lock =lock)
 
 @app.route('/')
 def hello():
@@ -178,7 +183,5 @@ def hello():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
-#   server = pywsgi.WSGIServer(('0.0.0.0', 8080), app)
-#   server.serve_forever()
+    app.run(host='0.0.0.0', port=1234)
 
