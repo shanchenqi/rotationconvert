@@ -4,20 +4,10 @@ import numpy as np
 from flask import Flask, render_template
 from flask import request
 from flask import flash
-from gevent import pywsgi
 from scipy.spatial.transform import Rotation as R
 
 app = Flask(__name__)
-app.secret_key = '123456'
-# app.config['SECRET_KEY'] = '123456'
-# app.config.update(SECRET_KEY = ‘123456’)
-
-euler = [0, 0, 0]
-quat = [0, 0, 0, 0]
-matrix = [[0,0,0],[0,0,0],[0,0,0]]
-threshold = 1e-6
-get_value = [euler, quat, matrix]
-return_value=[euler, quat, matrix]
+count = 0
 
 def mul(q1, q2):
     w = q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2] - q1[3]*q2[3]
@@ -124,6 +114,12 @@ def transform_quat_to_matrix(quat):
 
 @app.route("/rotation", methods=["post"])
 def rotation():
+    global count
+    count +=1
+    if(count%10==0):
+        print("count:",count)
+        with open("./log.txt","w") as f:
+            f.write(str(count))
     if request.form['Calibrate_method'] == "fromEuler":
         get_value[0] = [request.form['euler0'], request.form['euler1'], request.form['euler2']]
         get_value[1] = [0, 0, 0, 0]
@@ -179,9 +175,17 @@ def rotation():
 
 @app.route('/')
 def hello():
+    global euler, quat, matrix, threshold, get_value, return_value
+    euler = [0, 0, 0]
+    quat = [0, 0, 0, 0]
+    matrix = [[0,0,0],[0,0,0],[0,0,0]]
+    threshold = 1e-6
+    get_value = [euler, quat, matrix]
+    return_value=[euler, quat, matrix]
     return render_template('index.html', name=get_value, name2=return_value)
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=1234)
+    app.run(host='0.0.0.0', port = 80)
+
 

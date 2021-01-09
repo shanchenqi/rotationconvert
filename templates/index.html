@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <title>Euler to/from quaternion</title>
 </head>
+<script>                                                                    
+if (window.performance.navigation.type == 1/* 刷新 */){
+    name =[[0,0,0],[0,0,0,0],[[0,0,0],[0,0,0],[0,0,0]]]
+}
+</script>
+
 <body>
 
 <h1>INPUT：</h1>
 <form action="rotation", method="post">
-
 Euler angle:
 
     <input type="text" id="euler0", name="euler0", value={{name[0][0]}}>
@@ -16,13 +21,12 @@ Euler angle:
     <input type="text" id="euler2", name="euler2", value={{name[0][2]}}>
     <br>
     <br>
-
-旋转方式：
+Rotation Type：
 <select name="euler_type">
     <option value="INT">INT</option>
     <option value="EXT">EXT</option>
 </select>
-旋转顺序：
+Rotation Order：
 <select name="euler_order">
     <option value="xyz">XYZ</option>
     <option value="xzy">XZY</option>
@@ -42,17 +46,16 @@ Euler angle:
     <br>
 
 
-    quaternion:
+    Quaternion:
     <input type="text" , id="q0", name="q0", value={{name[1][0]}}>
     <input type="text" , id="q1", name="q1", value={{name[1][1]}}>
     <input type="text" , id="q2", name="q2", value={{name[1][2]}}>
     <input type="text" , id="q3", name="q3", value={{name[1][3]}}>
     <br>
     <br>
-    <!-- <input type="submit"> -->
 
 
-    rotation matrix:<br>
+    Rotation matrix:<br>
 
     <input type="text" , id = "r00", name="r00", value={{name[2][0][0]}}>
     <input type="text" , id = "r01", name="r01", value={{name[2][0][1]}}>
@@ -70,21 +73,13 @@ Euler angle:
     <br>
     <br>
 
-计算方式：<br>
+Account Form：<br>
 <select name="Calibrate_method">
     <option value="fromEuler">From Euler</option>
     <option value="fromQuat">From Quat</option>
     <option value="fromMatrix">From Matrix</option>
     <br> <br>
 </select>
-<!--
-<select class="percentText" id="operatorId" name="operatorId">
-    <option value="">--Select All--</option>
-    <c:forEach items="${operators }" var="oper" varStatus="step">
-        <option value="1">宝马</option> <option value="2">奔驰</option> <option value="3">奥迪</option>
-        <option value = "${oper.operatorId }" ${oper.operatorId == param['operatorId']?'selected':''}>${oper.operatorName }</option>
-    </c:forEach>
-    </select> -->
 <br><br>
 <input type="submit" value="计算" >
 </form>
@@ -101,20 +96,22 @@ Euler angle:<br>
     <input type="text" id="outEuler1", name="euler1", value={{name2[0][1]}}>
     <input type="text" id="outEuler2", name="euler2", value={{name2[0][2]}}>
     <br>
+	<br>
 </form>
 
 
 
-quaternion:
+Quaternion:
 <form>
     <input type="text" , name="outQ0", value={{name2[1][0]}}>
     <input type="text" , name="outQ1", value={{name2[1][1]}}>
     <input type="text" , name="outQ2", value={{name2[1][2]}}>
     <input type="text" , name="outQ3", value={{name2[1][3]}}>
     <br>
+	<br>
 </form>
 
-rotation matrix:
+Rotation matrix:
 <form>
     <input type="text" , name="outR00", value={{name2[2][0][0]}}>
     <input type="text" , name="outR01", value={{name2[2][0][1]}}>
