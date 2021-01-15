@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Euler to/from quaternion</title>
 </head>
-<script>                                                                    
-if (window.performance.navigation.type == 1/* 刷新 */){
+<script>
+if (window.performance.navigation.type == 1){
     name =[[0,0,0],[0,0,0,0],[[0,0,0],[0,0,0],[0,0,0]]]
 }
 </script>
@@ -14,7 +14,7 @@ if (window.performance.navigation.type == 1/* 刷新 */){
 
 <h1>INPUT：</h1>
 <form action="rotation", method="post">
-Euler angle:
+Euler Radian angle:
 
     <input type="text" id="euler0", name="euler0", value={{name[0][0]}}>
     <input type="text" id="euler1", name="euler1", value={{name[0][1]}}>
@@ -23,23 +23,25 @@ Euler angle:
     <br>
 Rotation Type：
 <select name="euler_type">
-    <option value="INT">INT</option>
-    <option value="EXT">EXT</option>
+    <option value="INT" {% if euler_types=='INT' %} selected {% endif %} >
+        INT</option>
+    <option value="EXT" {% if euler_types=='EXT' %} selected {% endif %}>
+        EXT</option>
 </select>
 Rotation Order：
-<select name="euler_order">
-    <option value="xyz">XYZ</option>
-    <option value="xzy">XZY</option>
-    <option value="xyx">XYX</option>
-    <option value="xzx">XZX</option>
-    <option value="yxz">YXZ</option>
-    <option value="yzx">YZX</option>
-    <option value="yxy">YXY</option>
-    <option value="yzy">YZY</option>
-    <option value="zxy">ZXY</option>
-    <option value="zyx">ZYX</option>
-    <option value="zxz">ZXZ</option>
-    <option value="zyz">ZYZ</option>
+<select name="euler_order" value={{euler_orders}}>
+    <option value="XYZ" {% if euler_orders=="XYZ" %} selected {% endif %}> XYZ </option>
+    <option value="XZY" {% if euler_orders=="XZY" %} selected {% endif %}> XZY </option>
+    <option value="XYX" {% if euler_orders=="XYX" %} selected {% endif %}> XYX </option>
+    <option value="XZX" {% if euler_orders=="XZX" %} selected {% endif %}> XZX </option>
+    <option value="YXZ" {% if euler_orders=="YXZ" %} selected {% endif %}> YXZ </option>
+    <option value="YZX" {% if euler_orders=="YZX" %} selected {% endif %}> YZX </option>
+    <option value="YXY" {% if euler_orders=="YXY" %} selected {% endif %}> YXY </option>
+    <option value="YZY" {% if euler_orders=="YZY" %} selected {% endif %}> YZY </option>
+    <option value="ZXY" {% if euler_orders=="ZXY" %} selected {% endif %}> ZXY </option>
+    <option value="ZYX" {% if euler_orders=="ZYX" %} selected {% endif %}> ZYX </option>
+    <option value="ZXZ" {% if euler_orders=="ZXZ" %} selected {% endif %}> ZXZ </option>
+    <option value="ZYZ" {% if euler_orders=="ZYZ" %} selected {% endif %}> ZYZ </option>
 
 </select>
 <br>
@@ -74,19 +76,19 @@ Rotation Order：
     <br>
 
 Account Form：<br>
-<select name="Calibrate_method">
-    <option value="fromEuler">From Euler</option>
-    <option value="fromQuat">From Quat</option>
-    <option value="fromMatrix">From Matrix</option>
+<select name="Calibrate_method" value={{method}}>
+    <option value="fromEuler" {% if method=="fromEuler" %} selected {% endif %}>From Euler</option>
+    <option value="fromQuat"  {% if method=="fromQuat" %} selected {% endif %}>From Quat</option>
+    <option value="fromMatrix"{% if method=="fromMatrix" %} selected {% endif %}>From Matrix</option>
     <br> <br>
 </select>
 <br><br>
-<input type="submit" value="计算" >
+<input type="submit" value="Calculate" >
 </form>
 
 <h1>OUTPUT：</h1>
 
-Euler angle:<br>
+Euler Radian angle:<br>
     {% if lock %}
         <p style="color: red">Gimbal Lock occurs. Euler angles are non-unique</p>
     {% endif %}
@@ -96,7 +98,13 @@ Euler angle:<br>
     <input type="text" id="outEuler1", name="euler1", value={{name2[0][1]}}>
     <input type="text" id="outEuler2", name="euler2", value={{name2[0][2]}}>
     <br>
-	<br>
+    <br>
+    Rotation Type：
+    <input type="text" name="euler_type", value={{euler_types}}>
+    Rotation Order：
+    <input type="text" name="euler_type", value={{euler_orders}}>
+    <br>
+    <br>
 </form>
 
 

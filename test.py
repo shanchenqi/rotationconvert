@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import math
 import numpy as np
+import os
 from flask import Flask, render_template
 from flask import request
 from flask import flash
 from scipy.spatial.transform import Rotation as R
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.urandom(24)
 count = 0
 
 def mul(q1, q2):
@@ -20,11 +22,11 @@ def euler_to_quat(euler, type):
     q =[]
     i = 0
     for typeaxis in type:
-        if typeaxis == 'x':
+        if typeaxis == 'X':
             q.append([math.cos(euler[i]/2), math.sin(euler[i]/2), 0, 0])
-        elif typeaxis == 'y':
+        elif typeaxis == 'Y':
             q.append([math.cos(euler[i]/2), 0, math.sin(euler[i]/2), 0])
-        elif typeaxis == 'z':
+        elif typeaxis == 'Z':
             q.append([math.cos(euler[i]/2), 0, 0, math.sin(euler[i]/2)])
         i += 1
     return mul(mul(q[0], q[1]),q[2])
@@ -58,7 +60,7 @@ def transform_matrix_to_euler(R, intorext, types,lock):
         [R[2, 2], 0, R[1, 0], R[0, 0], math.pi, R[1, 0], R[0, 0],R[2, 1], -R[2, 0], R[2, 2],R[1, 2], R[0, 2], 1] #EXT_ZYZ
     ]
     angles = [0,0,0]
-    types_euler = ["xyz", "xzy", "yxz", "yzx", "zxy", "zyx", "xyx", "xzx", "yxy", "yzy", "zxz", "zyz"]
+    types_euler = ["XYZ", "XZY", "YXZ", "YZX", "ZXY", "ZYX", "XYX", "XZX", "YXY", "YZY", "ZXZ", "ZYZ"]
     types_id = types_euler.index(types)
     if(intorext == 'INT'):
         if(abs(rotationR[types_id][0] -1) < threshold):
@@ -125,18 +127,19 @@ def rotation():
         get_value[1] = [0, 0, 0, 0]
         get_value[2] = [[0,0,0],[0,0,0],[0,0,0]]
         euler = get_value[0]
-        types = request.form['euler_order']
+        type_s=types = request.form['euler_order']
         intorext = request.form['euler_type']
         if intorext == 'EXT':
-            types = types[::-1]
+            type_s = types[::-1]
         euler = list(map(float, euler))
-        quat =  euler_to_quat(euler, types)
+        quat =  euler_to_quat(euler, type_s)
         return_value[0] = euler
         return_value[1] = quat
         matrix = transform_quat_to_matrix(quat)
         return_value[2] = matrix
+        print("euler_orders=types", intorext)
 
-        return render_template('index.html', name=get_value, name2=return_value, lock =False)
+        return render_template('index.html', name=get_value, name2=return_value, lock =False, euler_orders=types, euler_types=intorext, method="fromEuler")
 
     if request.form['Calibrate_method'] == "fromQuat":
         get_value[1] = [request.form['q0'], request.form['q1'], request.form['q2'], request.form['q3']]
@@ -154,7 +157,7 @@ def rotation():
         return_value[1] = quat
         return_value[2] = rot_matrix
 
-        return render_template('index.html', name=get_value,name2=return_value, lock =lock)
+        return render_template('index.html', name=get_value,name2=return_value, lock =lock, euler_orders=types, euler_types=intorext, method="fromQuat")
 
     if request.form['Calibrate_method'] == "fromMatrix":
         get_value[2] =[ [request.form['r00'], request.form['r01'], request.form['r02']],
@@ -171,7 +174,7 @@ def rotation():
         return_value[0] = euler
         return_value[1] = quat
         return_value[2] = get_value[2]
-        return render_template('index.html', name=get_value,name2=return_value, lock =lock)
+        return render_template('index.html', name=get_value,name2=return_value, lock =lock,euler_orders=types, euler_types=intorext, method="fromMatrix")
 
 @app.route('/')
 def hello():
@@ -182,10 +185,10 @@ def hello():
     threshold = 1e-6
     get_value = [euler, quat, matrix]
     return_value=[euler, quat, matrix]
-    return render_template('index.html', name=get_value, name2=return_value)
+    return render_template('index.html', name=get_value, name2=return_value,euler_orders="", euler_types="", method="")
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port = 80)
+    app.run(host='0.0.0.0', port = 1233)
 
 
